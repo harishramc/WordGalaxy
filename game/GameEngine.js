@@ -333,47 +333,60 @@
      *                  onRewarded: onComplete, onError: onError }});
      *   AdMob (APK): via the Capacitor AdMob plugin's rewarded API.
      * ================================================================== */
+
+    
     _playRewardedAd(onComplete, onCancel) {
-      const overlay = document.createElement("div");
-      overlay.className = "ad-overlay";
-      overlay.innerHTML = `
-        <div class="ad-box">
-          <div class="ad-badge">REWARDED AD</div>
-          <div class="ad-sim">Simulated ad &middot; SDK plugs in here</div>
-          <div class="ad-timer"><span>3</span></div>
-          <button class="ad-skip" disabled>Skip</button>
-        </div>`;
-      document.body.appendChild(overlay);
 
-      const timerEl = overlay.querySelector(".ad-timer span");
-      const skipBtn = overlay.querySelector(".ad-skip");
-      let remaining = 3;
-      let completed = false;
+      if (
+        window.CrazyGames &&
+        window.CrazyGames.SDK &&
+        window.CrazyGames.SDK.ad
+      ) {
 
-      const finish = (didComplete) => {
-        if (completed) return;
-        completed = true;
-        clearInterval(iv);
-        overlay.remove();
-        if (didComplete) onComplete && onComplete();
-        else onCancel && onCancel();
-      };
+        window.CrazyGames.SDK.ad.requestAd(
+          "rewarded",
+          {
+            adFinished: () => {
+              console.log(
+                "[Word Galaxy] Rewarded ad completed"
+              );
 
-      const iv = setInterval(() => {
-        remaining -= 1;
-        if (remaining <= 0) {
-          timerEl.textContent = "0";
-          skipBtn.disabled = false;
-          skipBtn.textContent = "Claim reward";
-          skipBtn.classList.add("ad-skip--ready");
-          clearInterval(iv);
-        } else {
-          timerEl.textContent = String(remaining);
-        }
-      }, 1000);
+              if (onComplete) {
+                onComplete();
+              }
+            },
 
-      skipBtn.addEventListener("click", () => finish(true));
+            adError: (error) => {
+              console.warn(
+                "[Word Galaxy] Rewarded ad failed",
+                error
+              );
+
+              if (onCancel) {
+                onCancel();
+              }
+            },
+
+            adStarted: () => {
+              console.log(
+                "[Word Galaxy] Rewarded ad started"
+              );
+            }
+          }
+        );
+
+        return;
+      }
+
+      console.warn(
+        "[Word Galaxy] CrazyGames SDK unavailable"
+      );
+
+      if (onCancel) {
+        onCancel();
+      }
     }
+
 
     watchAdForHint(onComplete) {
       this._playRewardedAd(

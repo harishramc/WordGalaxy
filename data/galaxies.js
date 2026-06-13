@@ -352,7 +352,7 @@
       fact: "Quantum computers use qubits instead of bits.",
       reward: 150,
       puzzles: [
-        { word: "AI", letters: ["I","A"] }, // exception
+        { word: "", letters: ["I","A"] }, // exception
         { word: "DRON", letters: ["D","R","O","N"] },
         { word: "ROBOT", letters: ["O","R","B","O","T"] }
       ]

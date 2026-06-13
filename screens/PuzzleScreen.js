@@ -21,6 +21,7 @@
 
   WG.Screens.PuzzleScreen = {
     render(engine, params) {
+      gameplayStart();
       const galaxy = engine.currentGalaxy;
       const puzzle = engine.getCurrentPuzzle();
       const word = puzzle.word;
@@ -321,6 +322,7 @@
         previewEl.classList.remove("preview--show");
         drawLine(null);
         setTimeout(() => engine.onWordSolved(), 520);
+        gameplayStop();
       }
 
       function failAttempt() {
@@ -421,6 +423,7 @@
 
       /* ---- back button ----------------------------------------------- */
       root.querySelector('[data-action="back"]').addEventListener("click", () => {
+        gameplayStop();
         engine.sound.tick();
         engine.showGalaxyMap();
       });

@@ -16,6 +16,21 @@
  *   }
  * ========================================================================= */
 
+function getStorage() {
+  try {
+    if (
+      window.CrazyGames &&
+      window.CrazyGames.SDK &&
+      window.CrazyGames.SDK.data
+    ) {
+      return window.CrazyGames.SDK.data;
+    }
+  } catch (_) {}
+
+  return window.localStorage;
+}
+
+
 (function (global) {
   "use strict";
 
@@ -46,7 +61,8 @@
     load() {
       let parsed = null;
       try {
-        const raw = global.localStorage.getItem(STORAGE_KEY);
+        const storage = getStorage();
+        const raw = storage.getItem(STORAGE_KEY);
         if (raw) parsed = JSON.parse(raw);
       } catch (e) {
         console.warn("[SaveManager] Could not read save, starting fresh.", e);
@@ -65,7 +81,11 @@
 
     save() {
       try {
-        global.localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
+        const storage = getStorage();
+        storage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(this.data)
+        );
       } catch (e) {
         // Private mode / quota errors shouldn't crash gameplay.
         console.warn("[SaveManager] Could not persist save.", e);
